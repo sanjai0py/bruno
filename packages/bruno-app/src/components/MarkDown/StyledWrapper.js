@@ -13,6 +13,10 @@ const StyledMarkdownBodyWrapper = styled.div`
     padding-top: 0.5rem;
     font-size: 0.875rem;
 
+    code {
+      color: ${(props) => props.theme.text};
+    }
+
     h1 {
       margin: 0.67em 0;
       font-weight: var(--base-text-weight-semibold, 600);
