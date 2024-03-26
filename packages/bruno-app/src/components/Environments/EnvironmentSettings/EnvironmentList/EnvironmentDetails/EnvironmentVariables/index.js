@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useRef, useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
 import cloneDeep from 'lodash/cloneDeep';
 import { IconTrash } from '@tabler/icons';
@@ -16,6 +16,8 @@ import { maskInputValue } from 'utils/collections';
 const EnvironmentVariables = ({ environment, collection }) => {
   const dispatch = useDispatch();
   const { storedTheme } = useTheme();
+  const endOfList = useRef(null);
+  const [addVariableClicked, setAddVariableClicked] = useState(false);
 
   const formik = useFormik({
     enableReinitialize: true,
@@ -74,11 +76,19 @@ const EnvironmentVariables = ({ environment, collection }) => {
       enabled: true
     };
     formik.setFieldValue(formik.values.length, newVariable, false);
+    setAddVariableClicked(true);
   };
 
   const handleRemoveVar = (id) => {
     formik.setValues(formik.values.filter((variable) => variable.uid !== id));
   };
+
+  useEffect(() => {
+    if (endOfList.current && addVariableClicked) {
+      endOfList.current.scrollIntoView({ behavior: 'smooth' });
+      setAddVariableClicked(false);
+    }
+  }, [formik.values]);
 
   return (
     <StyledWrapper className="w-full mt-6 mb-6">
@@ -95,7 +105,7 @@ const EnvironmentVariables = ({ environment, collection }) => {
           </thead>
           <tbody>
             {formik.values.map((variable, index) => (
-              <tr key={variable.uid}>
+              <tr key={variable.uid} ref={index === formik.values.length - 1 ? endOfList : null}>
                 <td className="text-center">
                   <input
                     type="checkbox"
