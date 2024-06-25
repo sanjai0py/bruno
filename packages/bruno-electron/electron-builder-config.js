@@ -11,11 +11,14 @@ const config = {
   files: ['**/*'],
   publish: {
     provider: 'github',
-    releaseType: 'draft'
+    releaseType: 'release'
   },
   afterSign: 'notarize.js',
   mac: {
     artifactName: '${name}_${version}_${arch}_${os}.${ext}',
+    // artifactName: '${name}_${version}_${arch === "arm64" ? "arm" : arch}_${os}.${ext}',
+    // artifactName: '${name}_${version}_${arch == "arm64" ? "arm" : arch}_${os}.${ext}',
+
     category: 'public.app-category.developer-tools',
     target: [
       {
@@ -27,6 +30,28 @@ const config = {
         arch: ['x64', 'arm64']
       }
     ],
+    // target: [
+    //   {
+    //     target: 'dmg',
+    //     arch: ['x64'],
+    //     artifactName: '${name}_${version}_x64_${os}.${ext}'
+    //   },
+    //   {
+    //     target: 'dmg',
+    //     arch: ['arm64'],
+    //     artifactName: '${name}_${version}_arm_${os}.${ext}'
+    //   },
+    //   {
+    //     target: 'zip',
+    //     arch: ['x64'],
+    //     artifactName: '${name}_${version}_x64_${os}.${ext}'
+    //   },
+    //   {
+    //     target: 'zip',
+    //     arch: ['arm64'],
+    //     artifactName: '${name}_${version}_arm_${os}.${ext}'
+    //   }
+    // ],
     icon: 'resources/icons/mac/icon.icns',
     hardenedRuntime: true,
     identity: 'Anoop MD (W7LPPWA48L)',

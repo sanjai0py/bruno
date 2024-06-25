@@ -1,9 +1,11 @@
 const path = require('path');
 const isDev = require('electron-is-dev');
 const { format } = require('url');
-const { BrowserWindow, app, Menu, ipcMain } = require('electron');
+const { BrowserWindow, app, Menu, ipcMain, autoUpdater } = require('electron');
 const { setContentSecurityPolicy } = require('electron-util');
-const { updateElectronApp } = require('update-electron-app');
+
+// const { updateElectronApp } = require('update-electron-app');
+
 const menuTemplate = require('./app/menu-template');
 const { openCollection } = require('./app/collections');
 const LastOpenedCollections = require('./store/last-opened-collections');
@@ -31,6 +33,13 @@ const contentSecurityPolicy = [
   "style-src 'self' 'unsafe-inline' https:"
 ];
 
+// This is fake production mode
+Object.defineProperty(app, 'isPackaged', {
+  get() {
+    return true;
+  }
+});
+
 setContentSecurityPolicy(contentSecurityPolicy.join(';') + ';');
 
 const menu = Menu.buildFromTemplate(menuTemplate);
@@ -38,11 +47,18 @@ const menu = Menu.buildFromTemplate(menuTemplate);
 let mainWindow;
 let watcher;
 
+// updateElectronApp();
+
+const getUpdateURL = () => {
+  if (process.platform === 'darwin') {
+    return 'https://github.com/usebruno/bruno/releases/download/v1.19.0/bruno_1.19.0_x64_win.exe';
+  } else {
+    return 'https://updates.insomnia.rest/updates/win';
+  }
+};
+
 // Prepare the renderer once the app is ready
 app.on('ready', async () => {
-  updateElectronApp({
-    logger: console
-  });
   Menu.setApplicationMenu(menu);
   const { maximized, x, y, width, height } = loadWindowState();
 
