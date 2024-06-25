@@ -8,7 +8,7 @@ const notarize = async function (params) {
     return;
   }
 
-  let appId = 'com.usebruno.app';
+  let appId = 'com.github.Electron';
 
   let appPath = path.join(params.appOutDir, `${params.packager.appInfo.productFilename}.app`);
   if (!fs.existsSync(appPath)) {
@@ -20,11 +20,11 @@ const notarize = async function (params) {
 
   try {
     await electron_notarize.notarize({
-        appBundleId: appId,
-        appPath: appPath,
-        appleId: process.env.APPLE_ID,
-        appleIdPassword: process.env.APPLE_ID_PASSWORD,
-        ascProvider: 'W7LPPWA48L'
+      appBundleId: appId,
+      appPath: appPath,
+      appleId: process.env.APPLE_ID,
+      appleIdPassword: process.env.APPLE_ID_PASSWORD,
+      ascProvider: 'W7LPPWA48L'
     });
   } catch (error) {
     console.error(error);

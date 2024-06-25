@@ -12,7 +12,9 @@ import {
   processEnvUpdateEvent,
   runFolderEvent,
   runRequestEvent,
-  scriptEnvironmentUpdateEvent
+  scriptEnvironmentUpdateEvent,
+  appUpdateAvailable,
+  appUpdateDownloaded
 } from 'providers/ReduxStore/slices/collections';
 import { collectionAddEnvFileEvent, openCollectionEvent } from 'providers/ReduxStore/slices/collections/actions';
 import toast from 'react-hot-toast';
@@ -140,6 +142,14 @@ const useIpcEvents = () => {
       dispatch(updateCookies(val));
     });
 
+    const update_message = ipcRenderer.on('update_available', (val) => {
+      dispatch(appUpdateAvailable(val));
+    });
+
+    const update_downloaded = ipcRenderer.on('update_downloaded', (val) => {
+      dispatch(appUpdateDownloaded());
+    });
+
     return () => {
       removeCollectionTreeUpdateListener();
       removeOpenCollectionListener();
@@ -155,6 +165,8 @@ const useIpcEvents = () => {
       removeShowPreferencesListener();
       removePreferencesUpdatesListener();
       removeCookieUpdateListener();
+      update_message();
+      update_downloaded();
     };
   }, [isElectron]);
 };

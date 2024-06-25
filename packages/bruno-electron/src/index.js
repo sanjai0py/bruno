@@ -3,6 +3,8 @@ const isDev = require('electron-is-dev');
 const { format } = require('url');
 const { BrowserWindow, app, Menu, ipcMain } = require('electron');
 const { setContentSecurityPolicy } = require('electron-util');
+const log = require('electron-log');
+const { autoUpdater } = require('electron-updater');
 
 const menuTemplate = require('./app/menu-template');
 const { openCollection } = require('./app/collections');
@@ -15,6 +17,28 @@ const { loadWindowState, saveBounds, saveMaximized } = require('./utils/window')
 const registerNotificationsIpc = require('./ipc/notifications');
 
 const lastOpenedCollections = new LastOpenedCollections();
+
+Object.defineProperty(app, 'isPackaged', {
+  get() {
+    return true;
+  }
+});
+
+// autoUpdater.setFeedURL({
+//   provider: 'github',
+//   owner: 'sanjai0py',
+//   repo: 'bruno'
+// });
+
+autoUpdater.logger = log;
+autoUpdater.logger.transports.file.level = 'info';
+log.info('App starting...');
+
+if (isDev) {
+  // Useful for some dev/debugging tasks, but download can
+  // not be validated becuase dev app is not signed
+  autoUpdater.updateConfigPath = path.join(__dirname, 'dev-app-update.yml');
+}
 
 // Reference: https://content-security-policy.com/
 const contentSecurityPolicy = [
@@ -38,8 +62,14 @@ const menu = Menu.buildFromTemplate(menuTemplate);
 let mainWindow;
 let watcher;
 
+// function sendStatusToWindow(text) {
+//   log.info(text);
+//   mainWindow.webContents.send('main:message', text);
+// }
+
 // Prepare the renderer once the app is ready
 app.on('ready', async () => {
+  autoUpdater.checkForUpdatesAndNotify();
   Menu.setApplicationMenu(menu);
   const { maximized, x, y, width, height } = loadWindowState();
 
@@ -125,6 +155,13 @@ app.on('ready', async () => {
   registerCollectionsIpc(mainWindow, watcher, lastOpenedCollections);
   registerPreferencesIpc(mainWindow, watcher, lastOpenedCollections);
   registerNotificationsIpc(mainWindow, watcher);
+});
+
+autoUpdater.on('update-available', (props) => {
+  mainWindow.webContents.send('update_available', props);
+});
+autoUpdater.on('update-downloaded', () => {
+  mainWindow.webContents.send('update_downloaded');
 });
 
 // Quit the app once all windows are closed

@@ -1,7 +1,7 @@
 require('dotenv').config({ path: process.env.DOTENV_PATH });
 
 const config = {
-  appId: 'com.usebruno.app',
+  appId: 'com.github.Electron',
   productName: 'Bruno',
   electronVersion: '21.1.1',
   directories: {

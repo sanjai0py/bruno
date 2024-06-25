@@ -31,6 +31,7 @@
     "dev:web": "npm run dev --workspace=packages/bruno-app",
     "build:web": "npm run build --workspace=packages/bruno-app",
     "prettier:web": "npm run prettier --workspace=packages/bruno-app",
+    "publish": "npm run build --workspace=packages/bruno-app && npm run publish --workspace=packages/bruno-electron",
     "dev:electron": "npm run dev --workspace=packages/bruno-electron",
     "build:bruno-common": "npm run build --workspace=packages/bruno-common",
     "build:bruno-query": "npm run build --workspace=packages/bruno-query",
@@ -47,7 +48,6 @@
     "test:prettier:web": "npm run test:prettier --workspace=packages/bruno-app",
     "prepare": "husky install"
   },
-  
   "overrides": {
     "rollup": "3.2.5"
   },

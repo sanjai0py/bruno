@@ -2,6 +2,7 @@ import { useState } from 'react';
 import toast from 'react-hot-toast';
 import { useDispatch } from 'react-redux';
 import { openCollection, importCollection } from 'providers/ReduxStore/slices/collections/actions';
+import { appUpdateAvailable } from 'providers/ReduxStore/slices/collections/index';
 import { IconBrandGithub, IconPlus, IconDownload, IconFolders, IconSpeakerphone, IconBook } from '@tabler/icons';
 
 import Bruno from 'components/Bruno';
@@ -23,6 +24,8 @@ const Welcome = () => {
       (err) => console.log(err) && toast.error('An error occurred while opening the collection')
     );
   };
+
+  dispatch(appUpdateAvailable());
 
   const handleImportCollection = ({ collection, translationLog }) => {
     setImportedCollection(collection);
