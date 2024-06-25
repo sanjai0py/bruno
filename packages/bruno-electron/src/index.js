@@ -3,7 +3,7 @@ const isDev = require('electron-is-dev');
 const { format } = require('url');
 const { BrowserWindow, app, Menu, ipcMain } = require('electron');
 const { setContentSecurityPolicy } = require('electron-util');
-
+const { updateElectronApp } = require('update-electron-app');
 const menuTemplate = require('./app/menu-template');
 const { openCollection } = require('./app/collections');
 const LastOpenedCollections = require('./store/last-opened-collections');
@@ -40,6 +40,9 @@ let watcher;
 
 // Prepare the renderer once the app is ready
 app.on('ready', async () => {
+  updateElectronApp({
+    logger: console
+  });
   Menu.setApplicationMenu(menu);
   const { maximized, x, y, width, height } = loadWindowState();
 

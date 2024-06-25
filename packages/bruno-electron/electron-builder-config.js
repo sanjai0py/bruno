@@ -9,6 +9,10 @@ const config = {
     output: 'out'
   },
   files: ['**/*'],
+  publish: {
+    provider: 'github',
+    releaseType: 'draft'
+  },
   afterSign: 'notarize.js',
   mac: {
     artifactName: '${name}_${version}_${arch}_${os}.${ext}',

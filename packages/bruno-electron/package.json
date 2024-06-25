@@ -6,9 +6,15 @@
   "private": true,
   "main": "src/index.js",
   "author": "Anoop M D <anoop.md1421@gmail.com> (https://helloanoop.com/)",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/sanjai0py/bruno.git",
+    "directory": "packages/bruno-electron"
+  },
   "scripts": {
     "clean": "rimraf dist",
     "dev": "electron .",
+    "release": "electron-builder --config electron-builder-config.js",
     "dist:mac": "electron-builder --mac --config electron-builder-config.js",
     "dist:win": "electron-builder --win --config electron-builder-config.js",
     "dist:linux": "electron-builder --linux AppImage --config electron-builder-config.js",
@@ -53,6 +59,7 @@
     "qs": "^6.11.0",
     "socks-proxy-agent": "^8.0.2",
     "tough-cookie": "^4.1.3",
+    "update-electron-app": "^3.0.0",
     "uuid": "^9.0.0",
     "vm2": "^3.9.13",
     "yup": "^0.32.11"
