@@ -19,21 +19,21 @@ const registerNotificationsIpc = require('./ipc/notifications');
 
 const lastOpenedCollections = new LastOpenedCollections();
 
-Object.defineProperty(app, 'isPackaged', {
-  get() {
-    return true;
-  }
-});
+// Object.defineProperty(app, 'isPackaged', {
+//   get() {
+//     return true;
+//   }
+// });
 
 autoUpdater.logger = log;
 autoUpdater.logger.transports.file.level = 'debug';
 log.info('App starting...');
 
-if (isDev) {
-  // Useful for some dev/debugging tasks, but download can
-  // not be validated becuase dev app is not signed
-  autoUpdater.updateConfigPath = path.join(__dirname, 'dev-app-update.yml');
-}
+// if (isDev) {
+//   // Useful for some dev/debugging tasks, but download can
+//   // not be validated becuase dev app is not signed
+//   autoUpdater.updateConfigPath = path.join(__dirname, 'dev-app-update.yml');
+// }
 
 // Reference: https://content-security-policy.com/
 const contentSecurityPolicy = [
