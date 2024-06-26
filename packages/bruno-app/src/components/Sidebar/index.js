@@ -9,9 +9,15 @@ import GoldenEdition from './GoldenEdition';
 import { useState, useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { IconSettings, IconCookie, IconHeart } from '@tabler/icons';
-import { updateLeftSidebarWidth, updateIsDragging, showPreferences } from 'providers/ReduxStore/slices/app';
+import {
+  updateLeftSidebarWidth,
+  updateIsDragging,
+  showPreferences,
+  restartAndUpdateApp
+} from 'providers/ReduxStore/slices/app';
 import { useTheme } from 'providers/Theme';
 import Notifications from 'components/Notifications';
+import UpdaterModal from './updaterModal';
 
 const MIN_LEFT_SIDEBAR_WIDTH = 221;
 const MAX_LEFT_SIDEBAR_WIDTH = 600;
@@ -19,7 +25,9 @@ const MAX_LEFT_SIDEBAR_WIDTH = 600;
 const Sidebar = () => {
   const leftSidebarWidth = useSelector((state) => state.app.leftSidebarWidth);
   const preferencesOpen = useSelector((state) => state.app.showPreferences);
+  const appUpdateAvailable = useSelector((state) => state.app.appUpdateAvailable);
   const [goldenEditonOpen, setGoldenEditonOpen] = useState(false);
+  const [appUpdateModalOpen, setAppUpdateModalOpen] = useState(false);
 
   const [asideWidth, setAsideWidth] = useState(leftSidebarWidth);
   const [cookiesOpen, setCookiesOpen] = useState(false);
@@ -65,6 +73,14 @@ const Sidebar = () => {
     );
   };
 
+  const openUpdater = () => {
+    setAppUpdateModalOpen(true);
+  };
+
+  const triggerUpdate = () => {
+    dispatch(restartAndUpdateApp());
+  };
+
   useEffect(() => {
     document.addEventListener('mouseup', handleMouseUp);
     document.addEventListener('mousemove', handleMouseMove);
@@ -83,6 +99,7 @@ const Sidebar = () => {
     <StyledWrapper className="flex relative h-screen">
       <aside>
         {goldenEditonOpen && <GoldenEdition onClose={() => setGoldenEditonOpen(false)} />}
+        {appUpdateModalOpen && <UpdaterModal onClose={() => setAppUpdateModalOpen(false)} updateNow={triggerUpdate} />}
         <div className="flex flex-row h-screen w-full">
           {preferencesOpen && <Preferences onClose={() => dispatch(showPreferences(false))} />}
           {cookiesOpen && <Cookies onClose={() => setCookiesOpen(false)} />}
@@ -129,7 +146,14 @@ const Sidebar = () => {
                   Star
                 </GitHubButton> */}
               </div>
-              <div className="flex flex-grow items-center justify-end text-xs mr-2">v1.18.0</div>
+              <div
+                onClick={() => openUpdater()}
+                id="app-version"
+                className="flex flex-grow items-center justify-end text-xs mr-2 relative"
+              >
+                <span className={appUpdateAvailable ? 'has-update' : ''}>v1.18.0</span>
+                {appUpdateAvailable && <div className="update-dot"></div>}
+              </div>
             </div>
           </div>
         </div>

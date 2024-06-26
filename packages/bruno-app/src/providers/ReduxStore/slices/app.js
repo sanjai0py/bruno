@@ -72,6 +72,17 @@ export const appSlice = createSlice({
     },
     removeAllTasksFromQueue: (state) => {
       state.taskQueue = [];
+    },
+    appUpdateAvailable: (state, action) => {
+      state.appUpdateAvailable = true;
+      console.log('appUpdateAvailable', action);
+    },
+    appUpdateDownloaded: (state, action) => {
+      console.log('appUpdateDownloaded', action);
+    },
+    restartAndUpdateApp: () => {
+      const { ipcRenderer } = window;
+      ipcRenderer.invoke('renderer:restart-and-update-app');
     }
   }
 });
@@ -89,7 +100,10 @@ export const {
   updateCookies,
   insertTaskIntoQueue,
   removeTaskFromQueue,
-  removeAllTasksFromQueue
+  removeAllTasksFromQueue,
+  appUpdateAvailable,
+  appUpdateDownloaded,
+  restartAndUpdateApp
 } = appSlice.actions;
 
 export const savePreferences = (preferences) => (dispatch, getState) => {

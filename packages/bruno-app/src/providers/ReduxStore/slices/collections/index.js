@@ -1462,12 +1462,6 @@ export const collectionsSlice = createSlice({
           item.draft.request.docs = action.payload.docs;
         }
       }
-    },
-    appUpdateAvailable: (state, action) => {
-      console.log('appUpdateAvailable', action);
-    },
-    appUpdateDownloaded: (state, action) => {
-      console.log('appUpdateDownloaded', action.payload);
     }
   }
 });

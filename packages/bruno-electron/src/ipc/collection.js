@@ -21,6 +21,8 @@ const { moveRequestUid, deleteRequestUid } = require('../cache/requestUids');
 const { deleteCookiesForDomain, getDomainsWithCookies } = require('../utils/cookies');
 const EnvironmentSecretsStore = require('../store/env-secrets');
 
+const { autoUpdater } = require('electron-updater');
+
 const environmentSecretsStore = new EnvironmentSecretsStore();
 
 const envHasSecrets = (environment = {}) => {
@@ -393,6 +395,10 @@ const registerRendererEventHandlers = (mainWindow, watcher, lastOpenedCollection
     if (watcher && mainWindow) {
       openCollectionDialog(mainWindow, watcher);
     }
+  });
+
+  ipcMain.handle('renderer:restart-and-update-app', () => {
+    autoUpdater.quitAndInstall();
   });
 
   ipcMain.handle('renderer:remove-collection', async (event, collectionPath) => {

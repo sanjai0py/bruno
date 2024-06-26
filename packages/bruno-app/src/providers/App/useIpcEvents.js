@@ -12,10 +12,9 @@ import {
   processEnvUpdateEvent,
   runFolderEvent,
   runRequestEvent,
-  scriptEnvironmentUpdateEvent,
-  appUpdateAvailable,
-  appUpdateDownloaded
+  scriptEnvironmentUpdateEvent
 } from 'providers/ReduxStore/slices/collections';
+import { appUpdateAvailable, appUpdateDownloaded } from 'providers/ReduxStore/slices/app';
 import { collectionAddEnvFileEvent, openCollectionEvent } from 'providers/ReduxStore/slices/collections/actions';
 import toast from 'react-hot-toast';
 import { useDispatch } from 'react-redux';
@@ -147,6 +146,7 @@ const useIpcEvents = () => {
     });
 
     const update_downloaded = ipcRenderer.on('update_downloaded', (val) => {
+      console.log('update_downloaded');
       dispatch(appUpdateDownloaded());
     });
 

@@ -3,6 +3,7 @@ const isDev = require('electron-is-dev');
 const { format } = require('url');
 const { BrowserWindow, app, Menu, ipcMain } = require('electron');
 const { setContentSecurityPolicy } = require('electron-util');
+
 const log = require('electron-log');
 const { autoUpdater } = require('electron-updater');
 
@@ -24,14 +25,8 @@ Object.defineProperty(app, 'isPackaged', {
   }
 });
 
-// autoUpdater.setFeedURL({
-//   provider: 'github',
-//   owner: 'sanjai0py',
-//   repo: 'bruno'
-// });
-
 autoUpdater.logger = log;
-autoUpdater.logger.transports.file.level = 'info';
+autoUpdater.logger.transports.file.level = 'debug';
 log.info('App starting...');
 
 if (isDev) {
@@ -157,11 +152,27 @@ app.on('ready', async () => {
   registerNotificationsIpc(mainWindow, watcher);
 });
 
+// autoUpdater.on('checking-for-update', () => {
+//   mainWindow.webContents.send('checking-for-update');
+// });
+
 autoUpdater.on('update-available', (props) => {
-  mainWindow.webContents.send('update_available', props);
+  mainWindow.webContents.send('update_available');
 });
+
 autoUpdater.on('update-downloaded', () => {
   mainWindow.webContents.send('update_downloaded');
+});
+
+// autoUpdater.on('download-progress', (progressObj) => {
+//   let log_message = 'Download speed: ' + progressObj.bytesPerSecond;
+//   log_message = log_message + ' - Downloaded ' + progressObj.percent + '%';
+//   log_message = log_message + ' (' + progressObj.transferred + '/' + progressObj.total + ')';
+//   sendStatusToWindow(log_message);
+// });
+
+autoUpdater.on('error', (err) => {
+  log.error(err);
 });
 
 // Quit the app once all windows are closed
