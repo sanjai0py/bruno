@@ -26,6 +26,9 @@ const initialState = {
       codeFont: 'default'
     }
   },
+  autoUpdate: {
+    status: 'idle' // 'idle', 'available', 'downloaded'
+  },
   cookies: [],
   taskQueue: []
 };
@@ -72,6 +75,17 @@ export const appSlice = createSlice({
     },
     removeAllTasksFromQueue: (state) => {
       state.taskQueue = [];
+    },
+    appUpdateAvailable: (state, action) => {
+      state.autoUpdate.status = 'available';
+      state.autoUpdate.latestVersion = action.payload.version;
+    },
+    appUpdateDownloaded: (state) => {
+      state.autoUpdate.status = 'downloaded';
+    },
+    restartAndUpdateApp: () => {
+      const { ipcRenderer } = window;
+      ipcRenderer.invoke('renderer:restart-and-update-app');
     }
   }
 });
@@ -89,7 +103,10 @@ export const {
   updateCookies,
   insertTaskIntoQueue,
   removeTaskFromQueue,
-  removeAllTasksFromQueue
+  removeAllTasksFromQueue,
+  appUpdateAvailable,
+  appUpdateDownloaded,
+  restartAndUpdateApp
 } = appSlice.actions;
 
 export const savePreferences = (preferences) => (dispatch, getState) => {

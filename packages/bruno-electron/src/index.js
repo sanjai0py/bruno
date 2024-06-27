@@ -4,6 +4,8 @@ const { format } = require('url');
 const { BrowserWindow, app, Menu, ipcMain } = require('electron');
 const { setContentSecurityPolicy } = require('electron-util');
 
+const { registerAutoUpdater } = require('./ipc/updater');
+
 const menuTemplate = require('./app/menu-template');
 const { openCollection } = require('./app/collections');
 const LastOpenedCollections = require('./store/last-opened-collections');
@@ -40,6 +42,9 @@ let watcher;
 
 // Prepare the renderer once the app is ready
 app.on('ready', async () => {
+  // Register auto-updater
+  registerAutoUpdater(mainWindow);
+
   Menu.setApplicationMenu(menu);
   const { maximized, x, y, width, height } = loadWindowState();
 
