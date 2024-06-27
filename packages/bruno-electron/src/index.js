@@ -42,9 +42,6 @@ let watcher;
 
 // Prepare the renderer once the app is ready
 app.on('ready', async () => {
-  // Register auto-updater
-  registerAutoUpdater(mainWindow);
-
   Menu.setApplicationMenu(menu);
   const { maximized, x, y, width, height } = loadWindowState();
 
@@ -124,6 +121,9 @@ app.on('ready', async () => {
     require('electron').shell.openExternal(details.url);
     return { action: 'deny' };
   });
+
+  // Register auto-updater
+  registerAutoUpdater(mainWindow);
 
   // register all ipc handlers
   registerNetworkIpc(mainWindow);

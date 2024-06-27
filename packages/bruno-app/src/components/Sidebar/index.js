@@ -9,7 +9,12 @@ import GoldenEdition from './GoldenEdition';
 import { useState, useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { IconSettings, IconCookie, IconHeart } from '@tabler/icons';
-import { updateLeftSidebarWidth, updateIsDragging, showPreferences } from 'providers/ReduxStore/slices/app';
+import {
+  updateLeftSidebarWidth,
+  updateIsDragging,
+  showPreferences,
+  restartAndUpdateApp
+} from 'providers/ReduxStore/slices/app';
 import { useTheme } from 'providers/Theme';
 import Notifications from 'components/Notifications';
 import UpdaterModal from './updaterModal';
