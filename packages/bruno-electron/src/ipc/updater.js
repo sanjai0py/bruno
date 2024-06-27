@@ -1,6 +1,11 @@
 const { autoUpdater } = require('electron-updater');
+const log = require('electron-log');
 
 const registerAutoUpdater = (mainWindow) => {
+  autoUpdater.logger = log;
+  autoUpdater.logger.transports.file.level = 'info';
+  log.info('App starting...');
+
   autoUpdater.on('checking-for-update', () => {
     mainWindow.webContents.send('main:checking-for-update');
   });
