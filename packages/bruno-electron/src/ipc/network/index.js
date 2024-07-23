@@ -60,6 +60,25 @@ const safeParseJSON = (data) => {
   }
 };
 
+const saveCookiesFromResponse = async (response, requestUrl) => {
+  if (preferencesUtil.shouldStoreCookies()) {
+    const setCookieHeaders = Array.isArray(response.headers['set-cookie'])
+      ? response.headers['set-cookie']
+      : [response.headers['set-cookie']];
+
+    setCookieHeaders.forEach((header) => {
+      if (typeof header === 'string' && header.length) {
+        addCookieToJar(header, requestUrl);
+      }
+    });
+  }
+};
+
+const sendCookiesToRenderer = async (win) => {
+  const domainsWithCookies = await getDomainsWithCookies();
+  win.webContents.send('main:cookies-update', safeParseJSON(safeStringifyJSON(domainsWithCookies)));
+};
+
 const getEnvVars = (environment = {}) => {
   const variables = environment.variables;
   if (!variables || !variables.length) {
@@ -536,25 +555,8 @@ const registerNetworkIpc = (mainWindow) => {
 
       response.responseTime = responseTime;
 
-      // save cookies
-      if (preferencesUtil.shouldStoreCookies()) {
-        let setCookieHeaders = [];
-        if (response.headers['set-cookie']) {
-          setCookieHeaders = Array.isArray(response.headers['set-cookie'])
-            ? response.headers['set-cookie']
-            : [response.headers['set-cookie']];
-          for (let setCookieHeader of setCookieHeaders) {
-            if (typeof setCookieHeader === 'string' && setCookieHeader.length) {
-              addCookieToJar(setCookieHeader, request.url);
-            }
-          }
-        }
-      }
-
-      // send domain cookies to renderer
-      const domainsWithCookies = await getDomainsWithCookies();
-
-      mainWindow.webContents.send('main:cookies-update', safeParseJSON(safeStringifyJSON(domainsWithCookies)));
+      saveCookiesFromResponse(response, request.url);
+      await sendCookiesToRenderer(mainWindow);
 
       await runPostResponse(
         request,
@@ -989,6 +991,9 @@ const registerNetworkIpc = (mainWindow) => {
                 throw Promise.reject(error);
               }
             }
+
+            saveCookiesFromResponse(response, request.url);
+            await sendCookiesToRenderer(mainWindow);
 
             const postRequestScriptResult = await runPostResponse(
               request,
