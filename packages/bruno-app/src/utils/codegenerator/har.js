@@ -11,25 +11,6 @@ const getContentType = (mode) => {
   return contentTypes[mode] || '';
 };
 
-export const parseGraphQLRequestBody = (request) => {
-  if (request?.body?.mode === 'graphql' && request.body?.graphql) {
-    try {
-      const { graphql } = request.body;
-
-      if (typeof graphql.variables === 'string') {
-        graphql.variables = JSON.parse(graphql.variables);
-      }
-
-      request.body.graphql = {
-        query: graphql.query,
-        variables: graphql.variables
-      };
-    } catch (e) {
-      console.error('Failed to parse GraphQL variables', e);
-    }
-  }
-};
-
 const createHeaders = (request, headers) => {
   const enabledHeaders = headers.filter((header) => header.enabled).map(({ name, value }) => ({ name, value }));
 
@@ -49,10 +30,7 @@ const createPostData = (body) => {
   if (body.mode === 'graphql' && body.graphql) {
     return {
       mimeType: 'application/json',
-      text: JSON.stringify({
-        query: body.graphql.query || '', //This could break if no query values?
-        variables: body.graphql.variables || {}
-      })
+      text: JSON.stringify(body[body.mode])
     };
   }
 
@@ -76,8 +54,6 @@ const createPostData = (body) => {
 };
 
 export const buildHarRequest = ({ request, headers }) => {
-  parseGraphQLRequestBody(request);
-
   return {
     method: request.method,
     url: encodeURI(request.url),
