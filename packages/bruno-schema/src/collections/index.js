@@ -48,7 +48,7 @@ const varsSchema = Yup.object({
 
 const requestUrlSchema = Yup.string().min(0).defined();
 const requestMethodSchema = Yup.string()
-  .oneOf(['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'HEAD', 'OPTIONS'])
+  .oneOf(['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'HEAD', 'OPTIONS', 'TRACE'])
   .required('method is required');
 
 const graphqlBodySchema = Yup.object({
@@ -106,6 +106,13 @@ const authBasicSchema = Yup.object({
   .noUnknown(true)
   .strict();
 
+const authWsseSchema = Yup.object({
+  username: Yup.string().nullable(),
+  password: Yup.string().nullable()
+})
+  .noUnknown(true)
+  .strict();
+
 const authBearerSchema = Yup.object({
   token: Yup.string().nullable()
 })
@@ -115,6 +122,14 @@ const authBearerSchema = Yup.object({
 const authDigestSchema = Yup.object({
   username: Yup.string().nullable(),
   password: Yup.string().nullable()
+})
+  .noUnknown(true)
+  .strict();
+
+const authApiKeySchema = Yup.object({
+  key: Yup.string().nullable(),
+  value: Yup.string().nullable(),
+  placement: Yup.string().oneOf(['header', 'queryparams']).nullable()
 })
   .noUnknown(true)
   .strict();
@@ -179,16 +194,19 @@ const oauth2Schema = Yup.object({
 
 const authSchema = Yup.object({
   mode: Yup.string()
-    .oneOf(['inherit', 'none', 'awsv4', 'basic', 'bearer', 'digest', 'oauth2'])
+    .oneOf(['inherit', 'none', 'awsv4', 'basic', 'bearer', 'digest', 'oauth2', 'wsse', 'apikey'])
     .required('mode is required'),
   awsv4: authAwsV4Schema.nullable(),
   basic: authBasicSchema.nullable(),
   bearer: authBearerSchema.nullable(),
   digest: authDigestSchema.nullable(),
-  oauth2: oauth2Schema.nullable()
+  oauth2: oauth2Schema.nullable(),
+  wsse: authWsseSchema.nullable(),
+  apikey: authApiKeySchema.nullable()
 })
   .noUnknown(true)
-  .strict();
+  .strict()
+  .nullable();
 
 const requestParamsSchema = Yup.object({
   uid: uidSchema,
@@ -231,6 +249,40 @@ const requestSchema = Yup.object({
   .noUnknown(true)
   .strict();
 
+const folderRootSchema = Yup.object({
+  request: Yup.object({
+    headers: Yup.array().of(keyValueSchema).nullable(),
+    auth: authSchema,
+    script: Yup.object({
+      req: Yup.string().nullable(),
+      res: Yup.string().nullable()
+    })
+      .noUnknown(true)
+      .strict()
+      .nullable(),
+    vars: Yup.object({
+      req: Yup.array().of(varsSchema).nullable(),
+      res: Yup.array().of(varsSchema).nullable()
+    })
+      .noUnknown(true)
+      .strict()
+      .nullable(),
+    tests: Yup.string().nullable()
+  })
+    .noUnknown(true)
+    .strict()
+    .nullable(),
+  docs: Yup.string().nullable(),
+  meta: Yup.object({
+    name: Yup.string().nullable()
+  })
+    .noUnknown(true)
+    .strict()
+    .nullable()
+})
+  .noUnknown(true)
+  .nullable();
+
 const itemSchema = Yup.object({
   uid: uidSchema,
   type: Yup.string().oneOf(['http-request', 'graphql-request', 'folder', 'js']).required('type is required'),
@@ -247,6 +299,11 @@ const itemSchema = Yup.object({
     then: Yup.string(),
     // For all other types, the fileContent field is not required and can be null.
     otherwise: Yup.string().nullable()
+  }),
+  root: Yup.mixed().when('type', {
+    is: 'folder',
+    then: folderRootSchema,
+    otherwise: Yup.mixed().nullable().notRequired()
   }),
   items: Yup.lazy(() => Yup.array().of(itemSchema)),
   filename: Yup.string().nullable(),
@@ -269,8 +326,9 @@ const collectionSchema = Yup.object({
   runnerResult: Yup.object({
     items: Yup.array()
   }),
-  collectionVariables: Yup.object(),
-  brunoConfig: Yup.object()
+  runtimeVariables: Yup.object(),
+  brunoConfig: Yup.object(),
+  root: folderRootSchema
 })
   .noUnknown(true)
   .strict();

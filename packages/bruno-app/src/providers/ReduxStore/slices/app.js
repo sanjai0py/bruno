@@ -30,7 +30,8 @@ const initialState = {
     status: 'idle' // 'idle', 'available', 'downloaded'
   },
   cookies: [],
-  taskQueue: []
+  taskQueue: [],
+  systemProxyEnvVariables: {}
 };
 
 export const appSlice = createSlice({
@@ -86,6 +87,9 @@ export const appSlice = createSlice({
     restartAndUpdateApp: () => {
       const { ipcRenderer } = window;
       ipcRenderer.invoke('renderer:restart-and-update-app');
+    },
+    updateSystemProxyEnvVariables: (state, action) => {
+      state.systemProxyEnvVariables = action.payload;
     }
   }
 });
@@ -106,7 +110,8 @@ export const {
   removeAllTasksFromQueue,
   appUpdateAvailable,
   appUpdateDownloaded,
-  restartAndUpdateApp
+  restartAndUpdateApp,
+  updateSystemProxyEnvVariables
 } = appSlice.actions;
 
 export const savePreferences = (preferences) => (dispatch, getState) => {

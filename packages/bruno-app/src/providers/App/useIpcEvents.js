@@ -1,5 +1,10 @@
 import { useEffect } from 'react';
-import { showPreferences, updateCookies, updatePreferences } from 'providers/ReduxStore/slices/app';
+import {
+  showPreferences,
+  updateCookies,
+  updatePreferences,
+  updateSystemProxyEnvVariables
+} from 'providers/ReduxStore/slices/app';
 import {
   brunoConfigUpdateEvent,
   collectionAddDirectoryEvent,
@@ -15,10 +20,11 @@ import {
   scriptEnvironmentUpdateEvent
 } from 'providers/ReduxStore/slices/collections';
 import { appUpdateAvailable, appUpdateDownloaded } from 'providers/ReduxStore/slices/app';
-import { collectionAddEnvFileEvent, openCollectionEvent } from 'providers/ReduxStore/slices/collections/actions';
+import { collectionAddEnvFileEvent, openCollectionEvent, hydrateCollectionWithUiStateSnapshot } from 'providers/ReduxStore/slices/collections/actions';
 import toast from 'react-hot-toast';
 import { useDispatch } from 'react-redux';
 import { isElectron } from 'utils/common/platform';
+import { globalEnvironmentsUpdateEvent, updateGlobalEnvironments } from 'providers/ReduxStore/slices/global-environments';
 
 const useIpcEvents = () => {
   const dispatch = useDispatch();
@@ -105,6 +111,10 @@ const useIpcEvents = () => {
       dispatch(scriptEnvironmentUpdateEvent(val));
     });
 
+    const removeGlobalEnvironmentVariablesUpdateListener = ipcRenderer.on('main:global-environment-variables-update', (val) => {
+      dispatch(globalEnvironmentsUpdateEvent(val));
+    });
+
     const removeCollectionRenamedListener = ipcRenderer.on('main:collection-renamed', (val) => {
       dispatch(collectionRenamedEvent(val));
     });
@@ -137,6 +147,10 @@ const useIpcEvents = () => {
       dispatch(updatePreferences(val));
     });
 
+    const removeSystemProxyEnvUpdatesListener = ipcRenderer.on('main:load-system-proxy-env', (val) => {
+      dispatch(updateSystemProxyEnvVariables(val));
+    });
+
     const removeCookieUpdateListener = ipcRenderer.on('main:cookies-update', (val) => {
       dispatch(updateCookies(val));
     });
@@ -149,12 +163,21 @@ const useIpcEvents = () => {
       dispatch(appUpdateDownloaded());
     });
 
+    const removeGlobalEnvironmentsUpdatesListener = ipcRenderer.on('main:load-global-environments', (val) => {
+      dispatch(updateGlobalEnvironments(val));
+    });
+
+    const removeSnapshotHydrationListener = ipcRenderer.on('main:hydrate-app-with-ui-state-snapshot', (val) => {
+      dispatch(hydrateCollectionWithUiStateSnapshot(val));
+    })
+
     return () => {
       removeCollectionTreeUpdateListener();
       removeOpenCollectionListener();
       removeCollectionAlreadyOpenedListener();
       removeDisplayErrorListener();
       removeScriptEnvUpdateListener();
+      removeGlobalEnvironmentVariablesUpdateListener();
       removeCollectionRenamedListener();
       removeRunFolderEventListener();
       removeRunRequestEventListener();
@@ -166,6 +189,9 @@ const useIpcEvents = () => {
       removeCookieUpdateListener();
       updateAvailable();
       updateDownloaded();
+      removeSystemProxyEnvUpdatesListener();
+      removeGlobalEnvironmentsUpdatesListener();
+      removeSnapshotHydrationListener();
     };
   }, [isElectron]);
 };
