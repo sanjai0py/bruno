@@ -8,8 +8,11 @@
   "author": "Anoop M D <anoop.md1421@gmail.com> (https://helloanoop.com/)",
   "repository": {
     "type": "git",
-    "url": "https://github.com/usebruno/bruno.git",
-    "directory": "packages/bruno-electron"
+    "url": "https://github.com/usebruno/bruno.git"
+  },
+  "publish": {
+    "provider": "github",
+    "releaseType": "release"
   },
   "bugs": {
     "url": "https://github.com/usebruno/bruno/issues"
@@ -17,6 +20,7 @@
   "scripts": {
     "clean": "rimraf dist",
     "dev": "electron .",
+    "publish": "electron-builder --publish always",
     "dist:mac": "electron-builder --mac --config electron-builder-config.js",
     "dist:win": "electron-builder --win --config electron-builder-config.js",
     "dist:linux": "electron-builder --linux AppImage --config electron-builder-config.js",
